@@ -46,7 +46,7 @@ note: c1 leveraged the power of data and statistical testing to create personali
 
 ## That turned out pretty well
 
-- some stats about C1 today
+<img src="imgs/data+finance/c1_stats.png"/>
 
 
 ## And explains why data is the heart of our business
