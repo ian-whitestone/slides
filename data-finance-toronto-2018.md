@@ -272,3 +272,6 @@ Take a cloud migration as an opportunity to rethink core aspects of business
 
 - rationalize, justify and rethink your core controls, processes and models
 - Lift & shift VERSUS rebuild
+
+
+## Thanks!
