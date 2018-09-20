@@ -255,7 +255,7 @@ note: AWS' GUI, combined with the accessiblity of infrastructure automation scri
 
 ## Some closing thoughts
 
-Make investements early on in the migration process
+Make investments early on in the migration process
 <hr>
 
 - education & training
