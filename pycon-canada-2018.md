@@ -2,7 +2,7 @@
 ## Building a home security system with Pi & Slack!
 
 <!-- <img src="imgs/pycon/demo.gif"/> -->
-<img src="imgs/pycon/logo.png"/>
+<img src="imgs/pycon/logo.png" height="300px">
 
 **Ian Whitestone**
 
@@ -16,7 +16,7 @@ note:
 
 ## Follow Along?
 
-**Slides:** <a href="https://ian-whitestone.github.io/slides/pycon-canada-2018.html">ian-whitestone.github.io/slides/pycon-canada-2018.html</a>
+**Slides:** <a href="https://ian-whitestone.github.io/slides/pycon-canada-2018.html">ian-whitestone.github.io/slides</a>
 
 **Repo:** <a href="https://github.com/ian-whitestone/rpi-security-system">github.com/ian-whitestone/rpi-security-system</a>
 
@@ -52,9 +52,25 @@ note: Today I will walk you through how I solved each of these components
 ## Let's start with a demo
 
 
-<img src="imgs/pycon/demo_1.gif">
+<center>
+    <video controls autoplay="true" loop="true" muted="true" height="650" src="imgs/pycon/pycam_on_demo.mov"></video>
+</center>
 
-note: some things you just saw: slack is used to retrieve information from the system, and control the settings
+note: 
+
+
+<center>
+    <video controls autoplay="true" loop="false" muted="true" height="650" src="imgs/pycon/last_image_demo.mov"></video>
+</center>
+
+note: 
+
+
+<center>
+    <video controls autoplay="true" loop="false" muted="true" height="650" src="imgs/pycon/pi_status_demo.mov"></video>
+</center>
+
+note: 
 
 
 <img src="imgs/pycon/demo_2.gif">
@@ -64,28 +80,6 @@ note: alerts are also communicated via slack, and users can tag images for futur
 ---
 
 # Motion Detection
-
-
-## Hot Tip: Images are just a numpy array
-
-<img src="imgs/pycon/image_pixels.png">
-
-
-## Python libraries that do stuff with images
-
-* Pillow
-    - fork of Python Imaging Library (PIL)
-    - **image manipulation/processing library**
-    - generally easier to install
-<br>
-<br>
-
-* OpenCV
-    - Open source **computer vision library** in C++
-    - Python API built on top of library
-    - Includes a machine learning library to support computer
-    vision applications
-    - Large user base, lots of example, lots of documentation
 
 
 ## Motion detection with Background Subtraction
@@ -232,6 +226,38 @@ connected_devices = [d['hostName'] for d in devices]
 # Reducing False Positives
 
 
+<img src="imgs/pycon/spam.png" height="650px">
+
+note: talk about how it fails in inconsistent lighting conditions
+
+
+<img src="imgs/pycon/arch_2.png">
+
+
+~~`do_deep_learning()`~~
+<br>
+**download pre-trained image classifier model**
+
+
+```python
+import cv2
+
+# Load model
+net = cv2.dnn.readNetFromCaffe(proto_file, caffe_model_file)
+
+# Get classifications
+net.setInput(img)
+classifications = net.forward()
+```
+
+
+<img src="imgs/pycon/person_model_demo.gif">
+
+
+## Results
+
+<img src="imgs/pycon/results.png">
+
 ---
 
 # Wrapping up
@@ -273,3 +299,6 @@ you allowed me to build a home security system with:
 
 
 <img src="imgs/pycon/rotate_demo.gif" height="700px">
+
+
+<img src="imgs/pycon/misclassification.jpg">
