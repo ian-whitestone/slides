@@ -27,17 +27,6 @@ note:
 * And it came with a camera...  <!-- .element: class="fragment" -->
 * And it sat in a drawer for two years  <!-- .element: class="fragment" -->
 
-
-## Some options for motion detection
-
-<img src="imgs/pycon/ultrasonic.png" style="float: left; margin-right: 25px"> <!-- .element: class="fragment" -->
-<img src="imgs/pycon/pir.png" style="float: left; margin-right: 25px"> <!-- .element: class="fragment" -->
-<img src="imgs/pycon/pi-camera.png" style="float: left;"> <!-- .element: class="fragment" -->
-
-<img src="imgs/pycon/finger_up.png" style="float: right; margin-right: 100px"> <!-- .element: class="fragment" -->
-
-note: went with a camera,the first two methods frankly just suck.
-
 ---
 
 ## Home Security System Requirements
@@ -53,27 +42,24 @@ note: Today I will walk you through how I solved each of these components
 
 
 <center>
-    <video controls autoplay="true" loop="true" muted="true" height="650" src="imgs/pycon/pycam_on_demo.mov"></video>
+    <video controls="true" autoplay="false" loop="true" muted="true" height="650" src="imgs/pycon/pycam_on_demo.mov"></video>
 </center>
 
 note: 
 
 
 <center>
-    <video controls autoplay="true" loop="false" muted="true" height="650" src="imgs/pycon/last_image_demo.mov"></video>
+    <video controls autoplay="false" loop="false" muted="true" height="650" src="imgs/pycon/last_image_demo.mov"></video>
 </center>
 
 note: 
 
 
 <center>
-    <video controls autoplay="true" loop="false" muted="true" height="650" src="imgs/pycon/pi_status_demo.mov"></video>
+    <video controls autoplay="false" loop="true" muted="true" height="650">
+       <source src="imgs/pycon/demo_2.mp4" type="video/mp4"> Your browser does not support the video tag.
+    </video>
 </center>
-
-note: 
-
-
-<img src="imgs/pycon/demo_2.gif">
 
 note: alerts are also communicated via slack, and users can tag images for future model improvements
 
@@ -130,7 +116,9 @@ note: From this thresholded, dilated difference, you can see if the area of the 
 
 You can see how all this is layered together in the demo below.
 
-<img src="imgs/pycon/background_subtraction/background_subtraction_demo.gif" width="750px">
+<center>
+    <video controls autoplay="false" loop="false" muted="true" height="650" src="imgs/pycon/background_subtraction_demo.mov"></video>
+</center>
 
 note: This method of background subtraction was entirely based off of a blog post by Adrian Rosebrock over at pyimagesearch.com. Check out the references section at the bottom for a link to his post.
 
@@ -179,7 +167,7 @@ note: decorator ensures the request is coming from slack, since slack sends a un
 
 
 ### Turns out my router has an API..
-<img src="imgs/pycon/connected_devices.png" height="500px">
+<img src="imgs/pycon/connected_devices.png" height="650px">
 
 
 ```python
@@ -208,7 +196,7 @@ connected_devices = [d['hostName'] for d in devices]
 # Architecture
 
 
-<img src="imgs/pycon/arch_0.png">
+<img src="imgs/pycon/arch_2.png">
 
 
 ### But how do you make sure all that stuff is running?
@@ -229,9 +217,6 @@ connected_devices = [d['hostName'] for d in devices]
 <img src="imgs/pycon/spam.png" height="650px">
 
 note: talk about how it fails in inconsistent lighting conditions
-
-
-<img src="imgs/pycon/arch_2.png">
 
 
 ~~`do_deep_learning()`~~
@@ -270,12 +255,7 @@ you should probably buy an actual home security system <!-- .element: class="fra
 note: HOWEVER, if you want to learn a bit about flask web dev, slack bots, OpenCV and image processing, networking, application monitoring....playing with a raspberry pi is a pretty awesome experience!
 
 
-## IP addresses change...
-
-[github.com/ian-whitestone/rpi-security-system/issues/16](https://github.com/ian-whitestone/rpi-security-system/issues/16)
-
-
-## More important applications than home security
+## More important things than home security
 <hr>
 
 * Are there leftovers in the company kitchen?
