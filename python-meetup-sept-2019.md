@@ -19,7 +19,6 @@ note: hey everyone, my name is Ian & I work on the data team at Shopify. today I
     <img src="imgs/python-meetup-sept-2019/shopify.png" height="100px">
 </p>
 
-
 ---
 
 ## Serverless
@@ -70,7 +69,6 @@ Could run a λ with 250MB of RAM for 18.5 days straight.. <!-- .element: class="
 
 ## Serverless Python from Scratch
 
-
 note: in order to appreciate zappa, or any other serverless framework, you need to understand what life is like without them. I'm going to really quickly show you some end to end examples of how you would get a lambda function set up from scratch. i'm gonna go quick, because you don't need to be able to remember all the details, you just need walk away with a high level understanding of what's involved and all the nuances
 
 
@@ -119,7 +117,7 @@ note: every lambda function must accept some contextual information that AWS wil
 ```
 
 
-## Step 1: Build Deploymeent Package
+## Step 1: Build Deployment Package
 
 * AWS lambda just provides a linux environment with python installed
 * You need to upload any additional packages you need for your functions
@@ -206,9 +204,6 @@ note: first, we create our lambda function, and add a trust policy which says th
 
 ## Step 3: Create Lambda Function
 
-* In AWS you use IAM roles to dictate what things a service or user has access to
-* For our use case, the IAM role will describe all the other Amazon services our lambda function can interact with
-
 
 ```bash
 → aws lambda create-function \
@@ -289,6 +284,7 @@ Try again...
 
 
 ...rebuild our deployment packagement
+
 ...update our lambda function
 
 
