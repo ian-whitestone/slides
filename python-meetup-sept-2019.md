@@ -1,21 +1,24 @@
 ## Serverless Python with Zappa
 
-<!-- <img src="imgs/python-meetup-sept-2019/3.png" height="300px"> -->
+<!-- <img src="imgs/python-meetup-sept-2019/3.png" height="250px"> -->
 <img src="imgs/python-meetup-sept-2019/1.png" height="250px">
-<!-- <img src="imgs/python-meetup-sept-2019/2.png" height="300px"> -->
+<!-- <img src="imgs/python-meetup-sept-2019/2.png" height="250px"> -->
 <img src="imgs/python-meetup-sept-2019/t1.png" height="300px">
 
 **Toronto Python Meetup - September 2019**
 
 *Ian Whitestone*
 
+note: hey everyone, my name is Ian & I work on the data team at Shopify. today I am going to talk about a Python library called Zappa which makes doing serverless things 100 times easier. for the record, this has talk has nothing to do with Shopify or what I do at Shopify, but if people are curious about what type of stuff we do on the data team we should catch up after.
 
-<img src="imgs/blobs/blobwave.png" height="75px">
+
+<img src="imgs/blobs/blobwave.png" height="100px">
 <hr>
 <p> 
-    <img src="imgs/python-meetup-sept-2019/data.png" height="75px">
-    <img src="imgs/python-meetup-sept-2019/shopify.png" height="75px">
+    <img src="imgs/python-meetup-sept-2019/data.png" height="100px">
+    <img src="imgs/python-meetup-sept-2019/shopify.png" height="100px">
 </p>
+
 
 ---
 
@@ -45,7 +48,7 @@ note: serverless really means no permanent servers you have to manage.
 
 *"Run code without thinking about servers. Pay only for the compute time you consume."* 
 
-<p>- [lambda homepage](https://aws.amazon.com/lambda/)</p>
+<p>- [AWS lambda homepage](https://aws.amazon.com/lambda/)</p>
 
 note: if you're running Shopify or some other large business, serverless will end up costing you way more. but if you have a smaller web app or set of periodic jobs you want to run, it makes a lot of sense
 
@@ -68,13 +71,15 @@ Could run a λ with 250MB of RAM for 18.5 days straight.. <!-- .element: class="
 ## Serverless Python from Scratch
 
 
+note: in order to appreciate zappa, or any other serverless framework, you need to understand what life is like without them. I'm going to really quickly show you some end to end examples of how you would get a lambda function set up from scratch. i'm gonna go quick, because you don't need to be able to remember all the details, you just need walk away with a high level understanding of what's involved and all the nuances
+
+
 **Use Case:** Periodically download some data, save to cloud storage (S3)
 <hr>
     
 ```bash
 # Create virtualenv and install packages
 → pipenv install requests
-→ pipenv install yaml
 ```
 
 
@@ -101,17 +106,23 @@ def my_handler(event=None, context=None):
     main.do_stuff() # and things
 ```
 
+note: every lambda function must accept some contextual information that AWS will automatically pass in when invoking your function. for our use case, we are just running an arbitrary function on a schedule, so we don't use any of this.
+
 
 ```bash
 → tree
 ├── Pipfile
 ├── Pipfile.lock
 ├── app
-│   ├── config
-│   │   └── config.yml
 │   ├── main.py
 │   └── handler.py
 ```
+
+
+## Step 1: Build Deploymeent Package
+
+* AWS lambda just provides a linux environment with python installed
+* You need to upload any additional packages you need for your functions
 
 
 ```bash
@@ -144,22 +155,10 @@ Required-by: zappa
 ```
 
 
-`lambda_trust_policy.json`
+## Step 2: Create Identity & Access Management (IAM) Role
 
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-```
+* In AWS you use IAM roles to dictate what things a service or user has access to
+* For our use case, the IAM role will describe all the other Amazon services our lambda function can interact with
 
 
 ```bash
@@ -189,6 +188,8 @@ Required-by: zappa
 }
 ```
 
+note: first, we create our lambda function, and add a trust policy which says that the lambda service is allowed to use this IAM role
+
 
 ```bash
 # Give it full access to S3
@@ -203,6 +204,12 @@ Required-by: zappa
 ```
 
 
+## Step 3: Create Lambda Function
+
+* In AWS you use IAM roles to dictate what things a service or user has access to
+* For our use case, the IAM role will describe all the other Amazon services our lambda function can interact with
+
+
 ```bash
 → aws lambda create-function \
     --function-name download_stuff \
@@ -213,6 +220,11 @@ Required-by: zappa
     --memory-size 128 \
     --timeout 900 # max timeout (15 minutes)
 ```
+
+
+## Step 4: Create Cloudwatch Events to Trigger Lambda
+
+* Think "cronjob"
 
 
 ```bash
@@ -233,8 +245,7 @@ Test it out...
 
 <img src="imgs/blobs/blobfingerscrossed.png" height="50px">
 <hr>
-
-<img src="imgs/python-meetup-sept-2019/no_module_main.png" height="600px"> <!-- .element: class="fragment" --> 
+<img src="imgs/python-meetup-sept-2019/no_module_main.png" height="500px"> <!-- .element: class="fragment" --> 
 
 
 <img src="imgs/blobs/blobsweat.png" height="100px">
@@ -273,25 +284,18 @@ Try again...
 ```bash
 # Create virtualenv and install packages
 → pipenv install requests
-→ pipenv install yaml
 → pipenv install psycopg2 # new dependency!
 ```
 
 
 ...rebuild our deployment packagement
-
-
-```bash
-→ aws lambda update-function-code \
-    --function-name download_stuff \
-    --zip-file fileb://deployment-package.zip
-```
+...update our lambda function
 
 
 <img src="imgs/blobs/blobpray.png" height="100px">
 <hr>
 
-<img src="imgs/python-meetup-sept-2019/no_module_psycopg2.png" height="600px"> <!-- .element: class="fragment" --> 
+<img src="imgs/python-meetup-sept-2019/no_module_psycopg2.png" height="500px"> <!-- .element: class="fragment" --> 
 
 
 <img src="imgs/blobs/blobsweat.png" height="100px">
@@ -307,6 +311,11 @@ Try again...
     * [How to claw your way out of AWS Lambda function hell using the power of Docker](https://www.freecodecamp.org/news/escaping-lambda-function-hell-using-docker-40b187ec1e48/) <!-- .element: class="fragment" --> 
 
 note: certain libraries, like ones with c-extensions, need to be pre-compiled on Amazon linux
+
+
+<img src="imgs/blobs/blobsweat.png" height="100px">
+<img src="imgs/blobs/blobsweat.png" height="100px">
+<img src="imgs/blobs/blobsweat.png" height="100px">
 
 ---
 
@@ -329,7 +338,6 @@ note: First published in July 2016, packaged with useful features
 ```bash
 # Create virtualenv and install packages
 → pipenv install requests
-→ pipenv install yaml
 → pipenv install psycopg2
 → pipenv install zappa  # new dependency!
 ```
@@ -463,7 +471,7 @@ note: there are some other options out there...
 
 ## Wrapping up...
 
-* lambdas (aka serverless) is really awesome
+* lambdas (aka cloud functions) are really awesome
 * but setting them up, and managing your deployment packages is a HUGE pain in the ass <!-- .element: class="fragment" --> 
 * zappa is pretty sweet <!-- .element: class="fragment" --> 
 * so go build shit....and never worry about servers, AWS configurations or deployment packages again <!-- .element: class="fragment" --> 
