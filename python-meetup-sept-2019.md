@@ -52,7 +52,7 @@ note: serverless really means no permanent servers you have to manage.
 note: if you're running Shopify or some other large business, serverless will end up costing you way more. but if you have a smaller web app or set of periodic jobs you want to run, it makes a lot of sense
 
 
-### [aws.amazon.com/free](aws.amazon.com/free)
+### [aws.amazon.com/free](https://aws.amazon.com/free)
 
 <img src="imgs/python-meetup-sept-2019/aws_free_tier.png" height="550px">
 
