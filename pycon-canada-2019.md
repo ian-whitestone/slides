@@ -13,7 +13,7 @@
 
 *Ian Whitestone*
 
-note: hey everyone, my name is Ian & I work on the data team at Shopify. today I am going to talk about a Python library called Zappa which makes doing serverless things 100 times easier. for the record, this has talk has nothing to do with Shopify or what I do at Shopify, but if people are curious about what type of stuff we do on the data team we should catch up after.
+note: example speakr notes!
 
 
 <img src="imgs/blobs/blobwave.png" height="100px">
@@ -74,12 +74,7 @@ Inspired by a simple San Francisco [apartment posting slack bot](https://www.dat
 
 
 <center>
-    <video controls="true" muted="true" height="700px" src="imgs/pycon-canada-2019/clips/preferences.mp4"></video>
-</center>
-
-
-<center>
-    <video controls="true" muted="true" height="700px" src="imgs/pycon-canada-2019/clips/pull_listing.mp4"></video>
+    <video controls="true" muted="true" height="700px" src="imgs/pycon-canada-2019/clips/full_demo_2.mp4"></video>
 </center>
 
 ---
@@ -297,14 +292,32 @@ imgs = [
 
 ```sql
 SELECT listings.*
-FROM listings, user_location_preferences
+FROM listings, user_regions
 WHERE 
-    /* listing is within area user drew */
-    ST_Contains(user_location_preferences.geom, listings.geom)
-    /* And meets other constraints */
+    ST_Contains(user_regions.geom, listings.geom)
     AND bedrooms >= 1
     AND bathrooms >= 1
-    AND price < 5000
+    AND ...
+```
+
+
+```python
+from geoalchemy2 import Geometry
+from sqlalchemy import Column, Integer
+
+class Listing(BASE):
+    __tablename__ = "listings"
+
+    id = Column(Integer, primary_key=True)
+    geom = Column(Geometry(geometry_type="POINT", srid=4326))
+    bedrooms = Column(Integer)
+
+class UserRegion(BASE):
+    __tablename__ = "user_regions"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    geom = Column(Geometry(geometry_type="POLYGON", srid=4326))
 ```
 
 
@@ -319,12 +332,11 @@ listings = (
         Listing.price,
         ...
     )
-    .join(Listing)
     .join(
         UserRegion,
         and_(
-            UserRegion.slack_user_id == slack_user_id,
-            func.ST_Intersects(UserRegion.geom, Listing.geom),
+            UserRegion.user_id == 123,
+            func.ST_Contains(UserRegion.geom, Listing.geom),
         ),
     )
 ```
@@ -348,79 +360,331 @@ listings = (
 *Is this apartment priced **high**? **normally**? **low**?*
 
 
-<img src="imgs/pycon-canada-2019/google_flights_price_rank_full.png" height="600px">
-
+**Goal:** Get an expected price distribution based on the type of apartment
 
 <img src="imgs/pycon-canada-2019/listing_price_distribution.png" height="600px">
 
 
-<img src="imgs/pycon-canada-2019/listing_price_distribution_2.png" height="600px">
-
-
 ## Option 1: Clustering
-**Theory:** Cluster similar listings and use price distribution
+**Theory:** Cluster similar listings and use actual price distribution of cluster
+
+<div>
+    <img src="imgs/pycon-canada-2019/cluster.png" height="400px">
+    <br>
+    [Source](https://www.mathworks.com/help/stats/kmeans.html)
+</div>
+
+
+## Key problem with this approach:
+
+**Each variable is treated as having the same impact on price (after scaling)**
 
 
 ## Option 2: Linear Regression 
-**Theory:** Linear regression to predict mean, prediction interval to get distribution
+**Theory:** Linear regression to predict mean, calculate prediction interval to get range of expected values
+
+<div> <!-- .element: class="fragment" --> 
+    <img src="imgs/pycon-canada-2019/linear_regressino.png" height="500px">
+    <br>
+    [Source](https://apmonitor.com/che263/index.php/Main/PythonRegressionStatistics)
+</div>
 
 
-## Option 3: Quantile Regression 
-**Theory:** Quantile regression to predict p25, p75
+## However...
+
+Calculating the prediction interval relies on the **homoscedasticity assumption**, which states that the variance around the regression line is the same for all values of the predictor variable.
+
+
+We can quickly see this does not hold true..
+
+<img src="imgs/pycon-canada-2019/listing_price_distribution_3.png" height="600px">
+
+
+## Option 3: Quantile Regression
+
+**Theory:** Quantile regression to predict p25 & p75
+
+<div> <!-- .element: class="fragment" --> 
+    <img src="imgs/pycon-canada-2019/quantile_regression.png" height="500px">
+    <br>
+    [Source - statsmodels docs](https://www.statsmodels.org/dev/examples/notebooks/generated/quantile_regression.html)
+</div>
+
+
+<img src="imgs/pycon-canada-2019/listing_price_distribution_2.png" height="550px">
+
+
+<img src="imgs/pycon-canada-2019/listing_price_distribution_2.png" height="400px">
+
+<hr>
+
+* Price falls between `p25` and `p75` --> **typical** <!-- .element: class="fragment" --> 
+
+* Price falls below `p25` --> **low** <!-- .element: class="fragment" --> 
+
+* Price falls above `p75` --> **high** <!-- .element: class="fragment" --> 
 
 
 ## Feature Engineering
+
+
+We start with some standard features:
+<hr>
+
+* number of bedrooms, bathrooms
+* size (sqft)
+* is it furnished?
+* unit type (apartment building, house, condo, basement, etc..)
+* ...
+
+<hr>
+
+`price ~ bedrooms + bathrooms + size + is_furnished + ...`
+
+
+## But how do we account for location?
+
+<img src="imgs/pycon-canada-2019/location_data.png" height="600px">
+
+
+## Area Encoding?
+
+Automatically cluster each point into an "area"
 
 ```python
 from sklearn.cluster import KMeans
 
 X = df[['lat', 'long']].values
-km = KMeans(20, init='k-means++') # initialize
+km = KMeans(20, init='k-means++')
 km.fit(X)
-clusters = km.predict(X) # classify into k clusters
+clusters = km.predict(X) # classify points into 1 of 20 clusters
 ```
 
-
-<img src="imgs/pycon-canada-2019/clusters.png" height="600px">
+Note: could also use the maps API to get the actual neighborhood and then encode that
 
 
 <img src="imgs/pycon-canada-2019/clusters_2.png" height="600px">
 
 
-<img src="imgs/pycon-canada-2019/clusters_3.png" height="600px">
+`price ~ bedrooms + bathrooms + size + is_furnished + ... + cluster_0 + cluster_1 + ...`
 
 
-## Clustering
-
-<img src="imgs/pycon-canada-2019/clustering_ex_1.png" height="550px">
+<img src="imgs/pycon-canada-2019/regression_fit_1.png" height="600px">
 
 
-<img src="imgs/pycon-canada-2019/clips/clustering_ex_2.gif">
+<img src="imgs/pycon-canada-2019/clusters_2_circle.png" height="600px">
 
 
-## Validating results
+<img src="imgs/pycon-canada-2019/clusters_2_zoom_1.png" height="600px">
 
-<img src="imgs/pycon-canada-2019/price_rank_distribution.png" height="550px">
+
+**Arbitrary boundaries result in similar points being treated differently**
+
+<img src="imgs/pycon-canada-2019/clusters_2_zoom_2.png" height="550px">
+
+
+## Nearest Neighbors 
+#### 👪 🏠 ...?... 🏠 👪
+
+<div> <!-- .element: class="fragment" --> 
+    <img src="imgs/pycon-canada-2019/nns_example.png" height="425px">
+    <br>
+    [Source: Erik Bernhardsson's Fantastic Blog](https://erikbern.com/2015/10/01/nearest-neighbors-and-vector-models-part-2-how-to-search-in-high-dimensional-spaces.html)
+</div>
+
+
+* Retrieve X nearest apartments with same # of bedrooms
+* Calculate mean, median, etc.
+* Feed that in as a feature to our model
+
+<hr>
+
+<p> [annoy](https://github.com/spotify/annoy) (Approximate Nearest Neighbors Oh Yeah) </p><!-- .element: class="fragment" --> 
+
+<p> (can also use [scikit-learn](https://scikit-learn.org/stable/modules/neighbors.html)) </p> <!-- .element: class="fragment" --> 
+
+
+
+```python
+>>> from annoy import AnnoyIndex
+
+# build the tree
+>>> featurees = ["lat_scaled", "long_scaled", "bedrooms_scaled"]
+>>> tree = AnnoyIndex(len(features), "euclidean")
+>>> for index, row in df[features].iterrows():
+        tree.add_item(index, row.values)
+>>> tree.build(10)
+
+...
+
+# search da tree
+>>> apartment_index = 1 # index of apartment to search
+>>> tree.get_nns_by_item(apartment_index, 51) # get 50 closest points
+[1, 23412, 424, 794, 12, 939, 58, 3, ...]
+```
+
+
+`price ~ bedrooms + bathrooms + size + is_furnished + ... + nn_50_avg_price + ...`
+
+
+<img src="imgs/pycon-canada-2019/regression_fit_2.png" height="600px">
 
 
 ## Displaying to users
 
 
-<img src="imgs/pycon-canada-2019/price_rank_1.png" height="600px">
+<img src="imgs/pycon-canada-2019/google_flights_price_rank_full.png" height="600px">
+
+
+## User design considerations
+
+User's don't want a black box, otherwise they won't trust it. Give them context!
+<hr>
+
+*"$3,250 is normal"* <!-- .element: class="fragment" --> 
+
+versus <!-- .element: class="fragment" --> 
+
+*"$3,250 is typical for this type of listing. Listings with the same number of bedrooms, bathrooms and similar square footage and location typically have price ranges between $3,175 and $4,200"* <!-- .element: class="fragment" --> 
+
+<hr> <!-- .element: class="fragment" --> 
+
+<p> <!-- .element: class="fragment" --> 
+Note the rounding...*"price ranges between $3,183.23 and $4,177.69"* just seems sketchy
+</p>
+
+
+**Giving users an easy way to visualize where the price falls also provides additional context**
+
+<img src="imgs/pycon-canada-2019/price_rank_mini.png">
+
+
+
+## All ya need is a little...
+
+<img src="imgs/pycon-canada-2019/matplotlib.png"> <!-- .element: class="fragment" --> 
+
+
+```python
+# normal (orange - middle) line
+x = (lower, upper)
+y = (1, 1)
+ax.plot(x, y, linestyle="-", c="#FBBC06", linewidth=5.0, solid_capstyle="round")
+
+# cheap (green - lower) line
+x = (min_price, lower - spacing)
+y = (1, 1)
+ax.plot(x, y, linestyle="-", c="#34A853", linewidth=5.0, solid_capstyle="round")
+
+# expensive (red - upper) line
+x = (upper + spacing, max_price)
+y = (1, 1)
+ax.plot(x, y, linestyle="-", c="#EA4334", linewidth=5.0, solid_capstyle="round")
+```
+
+<img src="imgs/pycon-canada-2019/drawing_pt1.png">
+
+
+```python
+# upper bound text
+ax.text(upper - spacing * 2, 0.9925, f"${upper}", fontsize=10, c="gray")
+
+# lower bound text
+ax.text(lower - spacing * 2.75, 0.9925, f"${lower}", fontsize=10, c="gray")
+```
+
+<img src="imgs/pycon-canada-2019/drawing_pt2.png">
+
+
+```python
+# price marker
+ax.plot(
+    price,
+    1,
+    marker="o",
+    markersize=12,
+    fillstyle="full",
+    c="w",
+    markeredgewidth=2.5,
+    markeredgecolor="#1A73E8",
+)
+```
+
+<img src="imgs/pycon-canada-2019/drawing_pt3.png">
+
+
+```python
+# tooltip triangle marker
+ax.plot(
+    price,
+    1.0038,
+    marker="v",
+    markersize=7,
+    fillstyle="full",
+    c="#1A73E8",
+    markeredgewidth=0.5,
+    markeredgecolor="#1A73E8",
+)
+```
+
+<img src="imgs/pycon-canada-2019/drawing_pt4.png">
+
+
+```python
+# rectangle textbox
+rect = patches.FancyBboxPatch(
+    xy=(rectangle_start, 1.0045),
+    width=rectangle_width,
+    height=0.0075,
+    edgecolor="#1A73E8",
+    facecolor="#1A73E8",
+    joinstyle="round",
+    capstyle="round",
+    boxstyle=patches.BoxStyle("Round", pad=0.000, rounding_size=0),
+)
+ax.add_patch(rect)
+```
+<img src="imgs/pycon-canada-2019/drawing_pt5.png">
+
+
+```python
+# price rank text
+ax.text(
+    text_start,
+    1.0096,
+    f"${display_price} is {price_rank}",
+    fontsize=10,
+    verticalalignment="top",
+    c="w",
+    fontweight="bold",
+)
+```
+<img src="imgs/pycon-canada-2019/drawing_pt6.png">
 
 
 <img src="imgs/pycon-canada-2019/price_rank_2.png" height="600px">
-
 
 ---
 
 ## Wrapping up...
 
-* xxx
+* keep it stupid simple
+* go build!
 
 ---
 
 ## Appendix
+
+
+```python
+import statsmodels.formula.api as smf
+
+mod = smf.quantreg('foodexp ~ income', data) # uses patsy model formulas
+res = mod.fit(q=.5)
+print(res.summary())
+```
+
+<img src="imgs/pycon-canada-2019/quantile_regression_summary.png" height="250px">
 
 
 ### [aws.amazon.com/free](https://aws.amazon.com/free)
@@ -433,5 +697,20 @@ clusters = km.predict(X) # classify into k clusters
 
 Could run a λ with 250MB of RAM for 18.5 days straight.. <!-- .element: class="fragment" --> 
 
-o
 
+<img src="imgs/pycon-canada-2019/clustering_ex_1.png" height="550px">
+
+
+<img src="imgs/pycon-canada-2019/clips/clustering_ex_2.gif">
+
+
+## Validating results
+
+<img src="imgs/pycon-canada-2019/price_rank_distribution.png" height="550px">
+
+
+## Model monitoring
+
+<img src="imgs/pycon-canada-2019/great_expectations.png">
+
+[great expectations](https://github.com/great-expectations/great_expectations)
