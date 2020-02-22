@@ -475,7 +475,7 @@ note: there are some other options out there...
 
 ## Additional Presentations & Reading
 
-Todays slides 👉 [ianwhitestone.work/slides](https://ianwhitestone.work/slides/python-meetup-sept-2019.html)
+Todays slides 👉 [ianwhitestone.work/talks](https://ianwhitestone.work/slides/python-meetup-sept-2019.html)
 <hr>
 
 * [Sean Coates - PyCon Canada 2017](https://www.youtube.com/watch?v=gSae_ZBBbkc)

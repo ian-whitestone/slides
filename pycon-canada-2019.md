@@ -23,7 +23,7 @@ note: example speakr notes!
     <img src="imgs/python-meetup-sept-2019/shopify.png" height="100px">
 </p>
 <hr>
-Today's slides 👉 [ianwhitestone.work/slides](https://ianwhitestone.work/slides/pycon-canada-2019.html)
+Today's slides 👉 [ianwhitestone.work/talks](https://ianwhitestone.work/slides/pycon-canada-2019.html)
 
 ---
 

@@ -16,7 +16,7 @@ note:
 
 ## Follow Along?
 
-**Slides:** <a href="https://ian-whitestone.github.io/slides/pycon-canada-2018.html">ian-whitestone.github.io/slides</a>
+**Slides:** <a href="https://ian-whitestone.github.io/slides/pycon-canada-2018.html">ianwhitestone.work/talks</a>
 
 **Repo:** <a href="https://github.com/ian-whitestone/rpi-security-system">github.com/ian-whitestone/rpi-security-system</a>
 
