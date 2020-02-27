@@ -1001,7 +1001,7 @@ note: ingesting listings from various sources, re-checking listing statuses, fee
 
 ## Example: Validating Row Counts
 
-* add graph of row counts by day
+<img src="imgs/serverless-meetup-feb-2020/listing_cnts.png" height="550px">
 
 
 ## Example: Validating Row Counts
@@ -1017,7 +1017,7 @@ note: ingesting listings from various sources, re-checking listing statuses, fee
     {
       "expectation_type": "expect_table_row_count_to_be_between",
       "kwargs": {
-        "min_value": 100
+        "min_value": 300
       }
     }
   ],
