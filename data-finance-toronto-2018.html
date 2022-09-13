@@ -2,68 +2,80 @@
 <html lang="en">
 
 <head>
-<meta charset="utf-8">
+  <meta charset="utf-8">
 
-<title>The Good and the Bad of Moving an Enterprise Data Ecosystem to the Cloud</title>
+  <title>The Good and the Bad of Moving an Enterprise Data Ecosystem to the Cloud</title>
 
-<link rel="stylesheet" href="css/bulma-columns.css">
-<link rel="stylesheet" href="css/reveal.css">
-<link rel="stylesheet" href="css/theme/default.css" id="theme">
+  <link rel="stylesheet" href="css/bulma-columns.css">
+  <link rel="stylesheet" href="css/reveal.css">
+  <link rel="stylesheet" href="css/theme/default.css" id="theme">
 
-<link rel="stylesheet" href="lib/css/zenburn.css">
+  <link rel="stylesheet" href="lib/css/zenburn.css">
 
-<script type="text/javascript">
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156053338-2"></script>
+  <script type="text/javascript">
+  < !--Global site tag(gtag.js) - Google Analytics-- >
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156053338-2"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-    gtag('config', 'UA-156053338-2');
+      gtag('config', 'UA-156053338-2');
   </script>
-</script>
+  </script>
+
+  <!-- Google Analytics 4 -->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM6SRP7NQT"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {dataLayer.push(arguments); }
+      gtag('js', new Date());
+
+      gtag('config', 'G-SM6SRP7NQT');
+  </script>
+  <!-- End Google Analytics 4 -->
+
 </head>
 
 <body>
 
 
-<div class="reveal">
+  <div class="reveal">
 
-  <div class="slides">
+    <div class="slides">
 
-    <section data-markdown="data-finance-toronto-2018.md"
-      data-separator="^---"
-      data-separator-notes="^Notes:"
-      data-vertical="^\n\n"></section>
+      <section data-markdown="data-finance-toronto-2018.md" data-separator="^---" data-separator-notes="^Notes:"
+        data-vertical="^\n\n"></section>
+    </div>
   </div>
-</div>
 
 
-<script src="lib/js/head.min.js"></script>
-<script src="js/reveal.js"></script>
+  <script src="lib/js/head.min.js"></script>
+  <script src="js/reveal.js"></script>
 
-<script>
+  <script>
 
-Reveal.initialize({
-controls: true,
-progress: true,
-history: true,
-center: true,
-width: 1200,
-// height: 900,
+      Reveal.initialize({
+        controls: true,
+      progress: true,
+      history: true,
+      center: true,
+      width: 1200,
+      // height: 900,
 
-// Optional libraries used to extend on reveal.js
-dependencies: [
-{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
-{ src: 'marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-{ src: 'markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-{ src: 'notes.js' }
-]
+      // Optional libraries used to extend on reveal.js
+      dependencies: [
+      {src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      {src: 'marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      {src: 'markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      {src: 'plugin/highlight/highlight.js', async: true, callback: function() {hljs.initHighlightingOnLoad(); } },
+      {src: 'notes.js' }
+      ]
 });
 
-</script>
+  </script>
 
 </body>
+
 </html>
